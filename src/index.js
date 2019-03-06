@@ -1,6 +1,9 @@
 /* @flow */
 
+import type { BytesR } from "@capnp-js/bytes";
 import type { Int64 } from "@capnp-js/int64";
+
+import { get } from "@capnp-js/bytes";
 
 /* Unsigned integer types. */
 type uint = number;
@@ -14,45 +17,45 @@ type i32 = number;
 type f32 = number;
 type f64 = number;
 
-export function bit(bytes: Uint8Array, position: uint, bitPosition: u3): i32 {
-  return bytes[position] & (0x01 << bitPosition);
+export function bit(bytes: BytesR, position: uint, bitPosition: u3): i32 {
+  return get(position, bytes) & (0x01 << bitPosition);
 }
 
-export function int8(bytes: Uint8Array, position: uint): i32 {
+export function int8(bytes: BytesR, position: uint): i32 {
   /* For negative integers, fill in the leading 1's. */
-  return (bytes[position] << 24) >> 24;
+  return (get(position, bytes) << 24) >> 24;
 }
 
-export function int16(bytes: Uint8Array, position: uint): i32 {
-  let value = bytes[position];
+export function int16(bytes: BytesR, position: uint): i32 {
+  let value = get(position, bytes);
 
   /* For negative integers, fill in the leading 1's. */
-  value |= (bytes[++position] << 24) >> 16;
+  value |= (get(++position, bytes) << 24) >> 16;
 
   return value;
 }
 
-export function int32(bytes: Uint8Array, position: uint): i32 {
-  let value = bytes[position];
-  value |= bytes[++position] << 8;
-  value |= bytes[++position] << 16;
-  value |= bytes[++position] << 24;
+export function int32(bytes: BytesR, position: uint): i32 {
+  let value = get(position, bytes);
+  value |= get(++position, bytes) << 8;
+  value |= get(++position, bytes) << 16;
+  value |= get(++position, bytes) << 24;
 
   return value;
 }
 
-export function uint8(bytes: Uint8Array, position: uint): u32 {
-  return bytes[position] >>> 0;
+export function uint8(bytes: BytesR, position: uint): u32 {
+  return get(position, bytes) >>> 0;
 }
 
-export function uint16(bytes: Uint8Array, position: uint): u32 {
-  let value = bytes[position];
-  value |= bytes[++position] << 8;
+export function uint16(bytes: BytesR, position: uint): u32 {
+  let value = get(position, bytes);
+  value |= get(++position, bytes) << 8;
 
   return value >>> 0;
 }
 
-export function uint32(bytes: Uint8Array, position: uint): u32 {
+export function uint32(bytes: BytesR, position: uint): u32 {
   return int32(bytes, position) >>> 0;
 }
 
